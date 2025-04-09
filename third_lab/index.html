@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple SPA</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background: #333;
+      color: #fff;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-right: 15px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    #logoutBtn {
+      background: crimson;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      margin-top: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      padding: 10px;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <a href="#login">Login</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#profile">Profile</a>
+    </nav>
+    <button id="logoutBtn" class="hidden">Logout</button>
+  </header>
+
+  <main id="app">
+    <!-- Dynamic content here -->
+  </main>
+
+  <script>
+    const state = {
+      user: null,
+    };
+
+    function render() {
+      const app = document.getElementById("app");
+      const hash = location.hash || "#login";
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      logoutBtn.classList.toggle("hidden", !state.user);
+
+      if (hash === "#login") {
+        app.innerHTML = `
+          <h2>Login</h2>
+          <form id="loginForm">
+            <input id="username" placeholder="Enter username" required />
+            <button type="submit">Login</button>
+          </form>
+        `;
+        document.getElementById("loginForm").onsubmit = (e) => {
+          e.preventDefault();
+          const username = document.getElementById("username").value;
+          if (username.trim()) {
+            state.user = { username };
+            location.hash = "#dashboard";
+          }
+        };
+      } else if (hash === "#dashboard") {
+        if (!state.user) {
+          location.hash = "#login";
+          return;
+        }
+        app.innerHTML = `
+          <h2>Dashboard</h2>
+          <p>Welcome back, <strong>${state.user.username}</strong>!</p>
+          <p>This is your dashboard. Navigate to your profile using the top nav.</p>
+        `;
+    } else if (hash === "#profile") {
+        if (!state.user) {
+            location.hash = "#login";
+            return;
+        }
+
+        // Add mock user details
+        const userDetails = {
+            email: `${state.user.username.toLowerCase()}@example.com`,
+            joined: "March 25, 2025",
+            role: "Member"
+        };
+
+        app.innerHTML = `
+            <h2>Profile</h2>
+            <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem;">
+            <p><strong>Username:</strong> ${state.user.username}</p>
+            <p><strong>Email:</strong> ${userDetails.email}</p>
+            <p><strong>Joined:</strong> ${userDetails.joined}</p>
+            <p><strong>Role:</strong> ${userDetails.role}</p>
+            </div>
+            <p style="margin-top: 1rem;">Your profile information is shared across pages.</p>
+        `;
+        }
+    }
+
+    window.addEventListener("hashchange", render);
+    window.addEventListener("load", render);
+    document.getElementById("logoutBtn").onclick = () => {
+      state.user = null;
+      location.hash = "#login";
+    };
+  </script>
+
+</body>
+</html>
